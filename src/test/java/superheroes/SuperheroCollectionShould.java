@@ -1,5 +1,6 @@
 package superheroes;
 
+import org.junit.Before;
 import org.junit.Test;
 import webserver.Status;
 
@@ -10,17 +11,40 @@ import static org.mockito.Mockito.when;
 
 public class SuperheroCollectionShould {
 
-  private Superhero someSuperhero = new Superhero();
+  private Superhero someSuperhero;
+  private Database db;
+  private SuperheroCollection superheroCollection;
+
+  @Before
+  public void setUp() throws Exception {
+    someSuperhero = new Superhero();
+    db = mock(Database.class);
+    superheroCollection = new SuperheroCollection(db);
+  }
 
   @Test
   public void addSuperheroToDbWhenNewRequestToAddWasMade() throws Exception {
-
-    Database db = mock(Database.class);
     when(db.add(any(Superhero.class))).thenReturn(Database.Status.Ok);
 
     Status expected = Status.OkSuperheroAdded;
-    assertEquals(SuperheroCollection.addNewSuperhero(someSuperhero), expected);
+    assertEquals(superheroCollection.addNewSuperhero(someSuperhero), expected);
+  }
 
+  @Test
+  public void deletesSuperheroFromDbWhenNewRequestToDeleteWasMade() throws Exception {
+    when(db.exists(someSuperhero)).thenReturn(Database.Status.ItemExists);
+    when(db.delete(any(Superhero.class))).thenReturn(Database.Status.Ok);
 
+    Status expected = Status.OkSuperheroDeleted;
+    assertEquals(superheroCollection.deleteSuperhero(someSuperhero), expected);
+  }
+
+  @Test
+  public void warningIsReturnedWhenNewRequestToDeleteWasMadeButSuperheroDoesNotExist() throws Exception {
+    when(db.exists(someSuperhero)).thenReturn(Database.Status.ItemDoesNotExist);
+    when(db.delete(any(Superhero.class))).thenReturn(Database.Status.Ok);
+
+    Status expected = Status.SuperheroDoesNotExist;
+    assertEquals(superheroCollection.deleteSuperhero(someSuperhero), expected);
   }
 }

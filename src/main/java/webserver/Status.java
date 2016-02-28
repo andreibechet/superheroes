@@ -1,5 +1,8 @@
 package webserver;
 
 public enum Status {
-  OkSuperheroAdded
+  OkSuperheroAdded,
+  SuperheroDoesNotExist,
+  OkSuperheroDeleted,
+  Error
 }
