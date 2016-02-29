@@ -4,19 +4,20 @@ import org.junit.Before;
 import org.junit.Test;
 import webserver.Status;
 
+import java.util.Optional;
+
 import static org.junit.Assert.assertEquals;
 import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.*;
 
 public class SuperheroCollectionShould {
 
-  private Superhero someSuperhero;
+  private Superhero someSuperhero = new Superhero("Iron Man");
   private Database db;
   private SuperheroCollection superheroCollection;
 
   @Before
   public void setUp() throws Exception {
-    someSuperhero = new Superhero();
     db = mock(Database.class);
     superheroCollection = new SuperheroCollection(db);
   }
@@ -72,5 +73,18 @@ public class SuperheroCollectionShould {
     when(db.add(someSuperhero, SuperheroCollection.PLEASE_UPDATE)).thenReturn(Database.Status.ItemUpdatedSuccessfully);
     expected = Status.OkSuperheroUpdated;
     assertEquals(superheroCollection.updateSuperhero(someSuperhero), expected);
+  }
+
+  @Test
+  public void returnSuperheroWhichWasStored() throws Exception {
+    when(db.add(someSuperhero)).thenReturn(Database.Status.ItemAddedSuccessfully);
+    when(db.get(someSuperhero.name)).thenReturn(Optional.ofNullable(someSuperhero));
+
+    Status expected = Status.OkSuperheroAdded;
+    assertEquals(superheroCollection.addNewSuperhero(someSuperhero), expected);
+
+    Optional<Superhero> expectedSuperhero = Optional.ofNullable(someSuperhero);
+    assertEquals(superheroCollection.getSuperhero(someSuperhero.name).isPresent(), expectedSuperhero.isPresent());
+    verify(db, times(1)).get(someSuperhero.name);
   }
 }

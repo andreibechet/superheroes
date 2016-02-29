@@ -2,6 +2,8 @@ package superheroes;
 
 import webserver.Status;
 
+import java.util.Optional;
+
 public class SuperheroCollection {
 
   public static final boolean PLEASE_UPDATE = true;
@@ -32,5 +34,9 @@ public class SuperheroCollection {
       case ItemUpdatedSuccessfully: return Status.OkSuperheroUpdated;
       default: return Status.Error;
     }
+  }
+
+  public Optional<Superhero> getSuperhero(String superheroName) {
+    return db.get(superheroName);
   }
 }
