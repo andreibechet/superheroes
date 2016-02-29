@@ -62,4 +62,15 @@ public class SuperheroCollectionShould {
     assertEquals(superheroCollection.addNewSuperhero(someSuperhero), expected);
     assertEquals(superheroCollection.deleteSuperhero(someSuperhero), expected);
   }
+
+  @Test
+  public void addUpdatedSuperheroIfUpdatedFlagIsTrue() throws Exception {
+    when(db.add(any(Superhero.class))).thenReturn(Database.Status.ItemExists);
+    Status expected = Status.SuperheroAlreadyExists;
+    assertEquals(superheroCollection.addNewSuperhero(someSuperhero), expected);
+
+    when(db.add(someSuperhero, SuperheroCollection.PLEASE_UPDATE)).thenReturn(Database.Status.ItemUpdatedSuccessfully);
+    expected = Status.OkSuperheroUpdated;
+    assertEquals(superheroCollection.updateSuperhero(someSuperhero), expected);
+  }
 }

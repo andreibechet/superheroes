@@ -9,5 +9,9 @@ public class Database {
     return Status.ItemDeletedSuccessfully;
   }
 
-  public enum Status {ItemExists, ItemDoesNotExist, ItemDeletedSuccessfully, Error, ItemAddedSuccessfully}
+  public Status add(Superhero superhero, Boolean update) {
+    return Status.ItemUpdatedSuccessfully;
+  }
+
+  public enum Status {ItemExists, ItemDoesNotExist, ItemDeletedSuccessfully, Error, ItemUpdatedSuccessfully, ItemAddedSuccessfully}
 }

@@ -5,5 +5,6 @@ public enum Status {
   SuperheroDoesNotExist,
   OkSuperheroDeleted,
   SuperheroAlreadyExists,
+  OkSuperheroUpdated,
   Error
 }

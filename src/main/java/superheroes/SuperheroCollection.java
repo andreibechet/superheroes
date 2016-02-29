@@ -4,6 +4,7 @@ import webserver.Status;
 
 public class SuperheroCollection {
 
+  public static final boolean PLEASE_UPDATE = true;
   private final Database db;
 
   public SuperheroCollection(Database db) {
@@ -22,6 +23,13 @@ public class SuperheroCollection {
     switch (db.delete(superhero)) {
       case ItemDeletedSuccessfully: return Status.OkSuperheroDeleted;
       case ItemDoesNotExist: return Status.SuperheroDoesNotExist;
+      default: return Status.Error;
+    }
+  }
+
+  public Status updateSuperhero(Superhero superhero) {
+    switch (db.add(superhero, PLEASE_UPDATE)) {
+      case ItemUpdatedSuccessfully: return Status.OkSuperheroUpdated;
       default: return Status.Error;
     }
   }
