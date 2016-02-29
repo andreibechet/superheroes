@@ -6,8 +6,7 @@ import webserver.Status;
 
 import static org.junit.Assert.assertEquals;
 import static org.mockito.Matchers.any;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 public class SuperheroCollectionShould {
 
@@ -24,7 +23,7 @@ public class SuperheroCollectionShould {
 
   @Test
   public void addSuperheroToDbWhenNewRequestToAddWasMade() throws Exception {
-    when(db.add(any(Superhero.class))).thenReturn(Database.Status.Ok);
+    when(db.add(any(Superhero.class))).thenReturn(Database.Status.ItemAddedSuccessfully);
 
     Status expected = Status.OkSuperheroAdded;
     assertEquals(superheroCollection.addNewSuperhero(someSuperhero), expected);
@@ -32,8 +31,7 @@ public class SuperheroCollectionShould {
 
   @Test
   public void deletesSuperheroFromDbWhenNewRequestToDeleteWasMade() throws Exception {
-    when(db.exists(someSuperhero)).thenReturn(Database.Status.ItemExists);
-    when(db.delete(any(Superhero.class))).thenReturn(Database.Status.Ok);
+    when(db.delete(any(Superhero.class))).thenReturn(Database.Status.ItemDeletedSuccessfully);
 
     Status expected = Status.OkSuperheroDeleted;
     assertEquals(superheroCollection.deleteSuperhero(someSuperhero), expected);
@@ -41,10 +39,27 @@ public class SuperheroCollectionShould {
 
   @Test
   public void warningIsReturnedWhenNewRequestToDeleteWasMadeButSuperheroDoesNotExist() throws Exception {
-    when(db.exists(someSuperhero)).thenReturn(Database.Status.ItemDoesNotExist);
-    when(db.delete(any(Superhero.class))).thenReturn(Database.Status.Ok);
+    when(db.delete(any(Superhero.class))).thenReturn(Database.Status.ItemDoesNotExist);
 
     Status expected = Status.SuperheroDoesNotExist;
+    assertEquals(superheroCollection.deleteSuperhero(someSuperhero), expected);
+  }
+
+  @Test
+  public void addSuperheroWillNotAddTheInfoToDbWhenItAlreadyExists() throws Exception {
+    when(db.add(any(Superhero.class))).thenReturn(Database.Status.ItemExists);
+
+    Status expected = Status.SuperheroAlreadyExists;
+    assertEquals(superheroCollection.addNewSuperhero(someSuperhero), expected);
+  }
+
+  @Test
+  public void yieldInAnErrorMsgIfTheDbErrors() throws Exception {
+    when(db.add(any(Superhero.class))).thenReturn(Database.Status.Error);
+    when(db.delete(any(Superhero.class))).thenReturn(Database.Status.Error);
+
+    Status expected = Status.Error;
+    assertEquals(superheroCollection.addNewSuperhero(someSuperhero), expected);
     assertEquals(superheroCollection.deleteSuperhero(someSuperhero), expected);
   }
 }

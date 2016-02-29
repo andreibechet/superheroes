@@ -11,15 +11,18 @@ public class SuperheroCollection {
   }
 
   public Status addNewSuperhero(Superhero superhero) {
-    return Status.OkSuperheroAdded;
+    switch (db.add(superhero)) {
+      case ItemAddedSuccessfully: return Status.OkSuperheroAdded;
+      case ItemExists: return Status.SuperheroAlreadyExists;
+      default: return Status.Error;
+    }
   }
 
   public Status deleteSuperhero(Superhero superhero) {
-    if (db.exists(superhero) == Database.Status.ItemExists) {
-      return db.delete(superhero) == Database.Status.Ok ? Status.OkSuperheroDeleted : Status.Error;
-    }
-    else {
-      return Status.SuperheroDoesNotExist;
+    switch (db.delete(superhero)) {
+      case ItemDeletedSuccessfully: return Status.OkSuperheroDeleted;
+      case ItemDoesNotExist: return Status.SuperheroDoesNotExist;
+      default: return Status.Error;
     }
   }
 }
