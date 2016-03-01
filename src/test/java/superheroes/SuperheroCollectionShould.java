@@ -4,6 +4,7 @@ import org.junit.Before;
 import org.junit.Test;
 import webserver.Status;
 
+import java.util.Arrays;
 import java.util.Optional;
 
 import static org.junit.Assert.assertEquals;
@@ -12,7 +13,13 @@ import static org.mockito.Mockito.*;
 
 public class SuperheroCollectionShould {
 
-  private Superhero someSuperhero = new Superhero("Iron Man");
+  private Superhero someSuperhero = new Superhero.SuperheroImagination()
+      .name("Iron Man")
+      .withPseudonym("Tony Stark")
+      .withSkills(Arrays.asList("Strength", "Intelligence"))
+      .withAllies(Arrays.asList("Thor", "Hulk"))
+      .withPublisher("Marvel")
+      .create();
   private Database db;
   private SuperheroCollection superheroCollection;
 
