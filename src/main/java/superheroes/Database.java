@@ -2,22 +2,22 @@ package superheroes;
 
 import java.util.Optional;
 
-public class Database {
-  public Status add(Superhero superhero) {
-    return Status.ItemAddedSuccessfully;
+public interface Database {
+  enum Status {
+    ItemExists,
+    ItemDoesNotExist,
+    ItemDeletedSuccessfully,
+    Error,
+    ItemUpdatedSuccessfully,
+    ItemAddedSuccessfully
   }
 
-  public Status delete(Superhero superhero) {
-    return Status.ItemDeletedSuccessfully;
-  }
+  Status add(Superhero superhero);
 
-  public Status add(Superhero superhero, Boolean update) {
-    return Status.ItemUpdatedSuccessfully;
-  }
+  Status add(Superhero superhero, Boolean update);
 
-  public Optional<Superhero> get(String someSuperheroName) {
-    return null;
-  }
+  Status delete(Superhero superhero);
 
-  public enum Status {ItemExists, ItemDoesNotExist, ItemDeletedSuccessfully, Error, ItemUpdatedSuccessfully, ItemAddedSuccessfully}
+  Optional<Superhero> get(String someSuperheroName);
+
 }
