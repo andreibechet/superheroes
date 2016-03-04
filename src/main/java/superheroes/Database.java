@@ -1,5 +1,6 @@
 package superheroes;
 
+import java.util.List;
 import java.util.Optional;
 
 public interface Database {
@@ -14,10 +15,12 @@ public interface Database {
 
   Status add(Superhero superhero);
 
-  Status add(Superhero superhero, Boolean update);
+  Status update(Superhero superhero);
 
   Status delete(Superhero superhero);
 
   Optional<Superhero> get(String someSuperheroName);
+
+  List<Superhero> getAll();
 
 }

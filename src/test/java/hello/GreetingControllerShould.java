@@ -1,6 +1,8 @@
 package hello;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import controllers.Application;
+import controllers.GreetingController;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -14,7 +16,7 @@ import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static org.springframework.test.web.servlet.setup.MockMvcBuilders.standaloneSetup;
-import static hello.GreetingController.GREETINGS_TEMPLATE;
+import static controllers.GreetingController.GREETINGS_TEMPLATE;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @SpringApplicationConfiguration(classes = Application.class)

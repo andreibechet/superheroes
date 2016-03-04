@@ -1,5 +1,7 @@
 package superheroes;
 
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 
@@ -50,12 +52,12 @@ public class Superhero {
   }
 
   public static class SuperheroImagination {
-    private String name;
-    private String pseudonym;
-    private String publisher;
-    private List<String> skills;
-    private List<String> allies;
-    private Date dateOfFirstAppearance;
+    private String name = "";
+    private String pseudonym = "";
+    private String publisher = "";
+    private List<String> skills = Collections.emptyList();
+    private List<String> allies = Collections.emptyList();
+    private Date dateOfFirstAppearance = new Date(0);
 
     public SuperheroImagination name(String name) {
       this.name = name;
