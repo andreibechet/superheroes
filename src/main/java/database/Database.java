@@ -1,4 +1,6 @@
-package superheroes;
+package database;
+
+import superheroes.Superhero;
 
 import java.util.List;
 import java.util.Optional;

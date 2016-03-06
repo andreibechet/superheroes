@@ -16,7 +16,7 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.context.web.WebAppConfiguration;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
-import superheroes.CouchDbDatabase;
+import database.CouchDbDatabase;
 import superheroes.Superhero;
 import superheroes.SuperheroCollection;
 
@@ -28,8 +28,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static org.springframework.test.web.servlet.setup.MockMvcBuilders.standaloneSetup;
 
-import static superheroes.CouchDbDatabase.QUERY_BY_NAME_MAP_FUNC_TEMPLATE;
-import static superheroes.CouchDbDatabase.ALL_DOCS_IN_DB;
+import static database.CouchDbDatabase.QUERY_BY_NAME_MAP_FUNC_TEMPLATE;
+import static database.CouchDbDatabase.ALL_DOCS_IN_DB;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @SpringApplicationConfiguration(classes = Application.class)

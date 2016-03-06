@@ -1,5 +1,7 @@
 package superheroes;
 
+import database.CouchDbDatabase;
+import database.Database;
 import org.junit.Before;
 import org.junit.Test;
 import webserver.Reply;
@@ -96,48 +98,4 @@ public class SuperheroCollectionShould {
     assertEquals(superheroCollection.getSuperhero(someSuperhero.name).isPresent(), expectedSuperhero.isPresent());
     verify(db, times(1)).get(someSuperhero.name);
   }
-
-//  @Test
-//  public void testCouchDb() throws Exception {
-//    CouchDbClient dbClient = new CouchDbClient("test", false, "http", "127.0.0.1", 5984, null, null);
-////    Response response = dbClient.save(someSuperhero);
-//
-////    assertEquals(response.getError(), null);
-//
-//    String mapFunction = "function(doc) { if (doc.name == %s) { emit(doc._id, doc); } }";
-//    DesignDocument.MapReduce map = new DesignDocument.MapReduce();
-//    map.setMap(String.format(mapFunction, "Iron Man"));
-//    List<JsonObject> docs = dbClient.view("_all_docs").includeDocs(true).tempView(map).query(JsonObject.class);
-//
-//    System.out.println("\n\n");
-//    System.out.println(docs.size());
-//    System.out.println(docs.get(0).getClass());
-//    System.out.println(docs.get(0));
-//    System.out.println(docs.get(0).get("name"));
-//    System.out.println(docs.get(0).get("skills"));
-//    System.out.println(docs.get(0).get("skills").getClass());
-//
-//    JsonObject test = docs.get(0);
-//    System.out.println(test.toString());
-//
-//    List<String> alliesList = new ArrayList<>();
-//    test.get("allies").getAsJsonArray().iterator().forEachRemaining((JsonElement jsonElem) -> alliesList.add(jsonElem.toString()));
-//
-//    List<String> skillsList = new ArrayList<>();
-//    test.get("skills").getAsJsonArray().iterator().forEachRemaining((JsonElement jsonElem) -> skillsList.add(jsonElem.toString()));
-//
-//    Superhero superhero = new Superhero.SuperheroImagination()
-//        .name(test.get("name").getAsString())
-//        .withPseudonym(test.get("pseudonym").getAsString())
-//        .withSkills(skillsList)
-//        .withAllies(alliesList)
-//        .withPublisher(test.get("publisher").getAsString())
-//        .create();
-//    System.out.println(superhero.toString());
-//
-//
-//    System.out.println("\n\n");
-//  }
-
-
 }

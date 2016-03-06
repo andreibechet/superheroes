@@ -1,4 +1,4 @@
-package superheroes;
+package database;
 
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
@@ -6,25 +6,25 @@ import org.lightcouch.CouchDbClient;
 import org.lightcouch.DesignDocument;
 import org.lightcouch.Response;
 import org.lightcouch.View;
+import superheroes.Superhero;
+import util.Utils;
 
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 import static superheroes.Superhero.*;
 
-// TODO: better naming maybe ?
 public class CouchDbDatabase implements Database {
+
 
   public static final String DEFAULT_SUPERHEROES_DB_NAME = "superheroes";
   public static final String LOCALHOST_URL = "127.0.0.1";
 
   public static final String ALL_DOCS_IN_DB = "_all_docs";
   public static final String QUERY_BY_NAME_MAP_FUNC_TEMPLATE =
-      "function(doc) { if (doc.name == %s) { emit(doc._id, doc); } }";
+      "function(doc) { if (doc.name == \"%s\") { emit(doc._id, doc); } }";
+  public static final String DESIGN_VIEW = "_design/";
+  public static final String DESIGN_ID = "mydesign";
+  public static final String MAP_KEY = "getSuperhero";
 
   private final CouchDbClient dbClient;
 
@@ -80,48 +80,23 @@ public class CouchDbDatabase implements Database {
     return superheros;
   }
 
-  private Optional<DocumentInfo> documentDetailsFor(Superhero superhero) {
-    List<JsonObject> existingElements = findExistingDocumentsFor(superhero.name);
-    if (existingElements.size() == 1) {
-      JsonObject superheroData = existingElements.get(0);
-      return Optional.of(
-          new DocumentInfo(superheroData.get("_id").getAsString(), superheroData.get("_rev").getAsString()));
-    }
-    return Optional.ofNullable(null);
-  }
-
-  private View getAllDocsView() {
-    return dbClient.view(ALL_DOCS_IN_DB).includeDocs(true);
-  }
-
   public static Superhero superheroFromJson(JsonObject superheroData) {
     SuperheroImagination imagination = new SuperheroImagination()
         .name(superheroData.get("name").getAsString());
 
-    // TODO: look into  . notation
     if (superheroData.has("pseudonym"))
       imagination = imagination.withPseudonym(superheroData.get("pseudonym").getAsString());
     if (superheroData.has("skills"))
-      System.out.println(getListOfPropertiesFromJsonElements("skills", superheroData));
       imagination = imagination.withSkills(getListOfPropertiesFromJsonElements("skills", superheroData));
     if (superheroData.has("allies"))
-      System.out.println(getListOfPropertiesFromJsonElements("allies", superheroData));
       imagination = imagination.withAllies(getListOfPropertiesFromJsonElements("allies", superheroData));
     if (superheroData.has("publisher"))
       imagination = imagination.withPublisher(superheroData.get("publisher").getAsString());
     if (superheroData.has("dataOfFirstAppearance"))
-      imagination = imagination.withDateOfFirstAppearance(getDate(superheroData));
+      imagination = imagination.withDateOfFirstAppearance(
+          Utils.getDateFromString(superheroData.get("dataOfFirstAppearance").getAsString()));
 
     return imagination.create();
-  }
-
-  private static Date getDate(JsonObject superheroData) {
-    SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
-    try {
-      return dateFormat.parse(superheroData.get("dataOfFirstAppearance").getAsString());
-    } catch (ParseException e) {
-      return new Date(0);
-    }
   }
 
   public static List<String> getListOfPropertiesFromJsonElements(String property, JsonObject superheroData) {
@@ -132,11 +107,59 @@ public class CouchDbDatabase implements Database {
   }
 
   public List<JsonObject> findExistingDocumentsFor(String name) {
+    setMapViewFor(name);
+    List<JsonObject> documents = Collections.emptyList();
+    try {
+      documents = dbClient.view(DESIGN_ID + "/" + MAP_KEY).includeDocs(true).query(JsonObject.class);
+    } catch (org.lightcouch.NoDocumentException e) {
+      // no documents were found, nothing to do
+    }
+
+    clearCouchDbDesignViews();
+    return documents;
+  }
+
+  private void setMapViewFor(String name) {
+    DesignDocument designDocument = designDocument();
+    DesignDocument.MapReduce map = mapReduce(name);
+
+    Map<String, DesignDocument.MapReduce> view = new HashMap<>();
+    view.put(MAP_KEY, map);
+
+    designDocument.setViews(view);
+    dbClient.design().synchronizeWithDb(designDocument);
+  }
+
+  private DesignDocument.MapReduce mapReduce(String name) {
     DesignDocument.MapReduce map = new DesignDocument.MapReduce();
     map.setMap(String.format(QUERY_BY_NAME_MAP_FUNC_TEMPLATE, name));
-    return getAllDocsView()
-        .tempView(map)
-        .query(JsonObject.class);
+    return map;
+  }
+
+  private DesignDocument designDocument() {
+    DesignDocument designDocument = new DesignDocument();
+    designDocument.setId(DESIGN_VIEW + DESIGN_ID);
+    designDocument.setLanguage("javascript");
+    return designDocument;
+  }
+
+  private void clearCouchDbDesignViews() {
+    dbClient.remove(DESIGN_VIEW + DESIGN_ID, dbClient.design().getFromDb(DESIGN_VIEW + DESIGN_ID).getRevision());
+  }
+
+  private View getAllDocsView() {
+    return dbClient.view(ALL_DOCS_IN_DB).includeDocs(true);
+  }
+
+  private Optional<DocumentInfo> documentDetailsFor(Superhero superhero) {
+    List<JsonObject> existingElements = findExistingDocumentsFor(superhero.name);
+
+    if (existingElements.size() == 1) {
+      JsonObject superheroData = existingElements.get(0);
+      return Optional.of(
+          new DocumentInfo(superheroData.get("_id").getAsString(), superheroData.get("_rev").getAsString()));
+    }
+    return Optional.ofNullable(null);
   }
 
   private class DocumentInfo {

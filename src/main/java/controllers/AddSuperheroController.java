@@ -6,16 +6,14 @@ import org.springframework.web.bind.annotation.RestController;
 import superheroes.Superhero;
 import superheroes.Superhero.SuperheroImagination;
 import superheroes.SuperheroCollection;
+import util.Utils;
 import webserver.Reply;
 
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.*;
 
 @RestController
 public class AddSuperheroController {
 
-  private static final List<String> EMPTY_LIST = Collections.emptyList();
   private final SuperheroCollection superheroCollection;
 
   public AddSuperheroController(SuperheroCollection superheroCollection) {
@@ -39,28 +37,40 @@ public class AddSuperheroController {
         .withSkills(getListOf(skills))
         .withAllies(getListOf(allies))
         .withPublisher(publisher)
-        .withDateOfFirstAppearance(getDateFromString(dataOfFirstAppearance))
+        .withDateOfFirstAppearance(Utils.getDateFromString(dataOfFirstAppearance))
         .create());
   }
 
-  // TODO: move to utils class + use the same in CouchDbDatabases
-  private Date getDateFromString(String dataOfFirstAppearance) {
-    SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
-    try {
-      return dateFormat.parse(dataOfFirstAppearance);
-    } catch (ParseException e) {
-      return new Date(0);
-      // TODO: Raise invalid parameter
-    }
+  @RequestMapping("/update/superhero")
+  public Reply.Status updateSuperhero(@RequestParam(value = "name", required = true) String name,
+                                   @RequestParam(value = "pseudonym", required = false, defaultValue = "") String pseudonym,
+                                   @RequestParam(value = "skills", required = false, defaultValue = "") String skills,
+                                   @RequestParam(value= "allies", required = false, defaultValue = "") String allies,
+                                   @RequestParam(value = "publisher", required = false, defaultValue = "") String publisher,
+                                   @RequestParam(value = "dataOfFirstAppearance", required = false, defaultValue = "") String dataOfFirstAppearance) {
+    return superheroCollection.updateSuperhero(new SuperheroImagination()
+        .name(name)
+        .withPseudonym(pseudonym)
+        .withSkills(getListOf(skills))
+        .withAllies(getListOf(allies))
+        .withPublisher(publisher)
+        .withDateOfFirstAppearance(Utils.getDateFromString(dataOfFirstAppearance))
+        .create());
   }
 
-  // TODO: move to utils class
-  private List<String> getListOf(String propertiesString) {
-    return propertiesString.equals("") ? EMPTY_LIST : Arrays.asList(propertiesString.split(",", -1));
+  @RequestMapping("/delete/superhero")
+  public Reply.Status deteleSuperhero(@RequestParam(value = "name", required = true) String name) {
+    return superheroCollection.deleteSuperhero(new SuperheroImagination()
+        .name(name)
+        .create());
   }
 
   @RequestMapping("/get/all")
   public List<Superhero> allSuperheroes() {
     return superheroCollection.getAll();
+  }
+
+  private List<String> getListOf(String propertiesString) {
+    return propertiesString.equals("") ? Utils.EMPTY_LIST : Arrays.asList(propertiesString.split(",", -1));
   }
 }

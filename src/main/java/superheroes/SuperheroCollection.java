@@ -1,5 +1,7 @@
 package superheroes;
 
+import database.CouchDbDatabase;
+import database.Database;
 import webserver.Reply;
 
 import java.util.List;
@@ -35,7 +37,7 @@ public class SuperheroCollection {
 
   public Reply.Status updateSuperhero(Superhero superhero) {
     switch (db.update(superhero)) {
-      case ItemUpdatedSuccessfully: return Reply.Status.OkSuperheroUpdated;
+      case ItemAddedSuccessfully: return Reply.Status.OkSuperheroUpdated;
       default: return Reply.Status.Error;
     }
   }
