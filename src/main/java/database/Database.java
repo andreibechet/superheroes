@@ -11,7 +11,6 @@ public interface Database {
     ItemDoesNotExist,
     ItemDeletedSuccessfully,
     Error,
-    ItemUpdatedSuccessfully,
     ItemAddedSuccessfully
   }
 
