@@ -81,7 +81,7 @@ public class SuperheroCollectionShould {
     Reply.Status expected = Reply.Status.SuperheroAlreadyExists;
     assertEquals(superheroCollection.addNewSuperhero(someSuperhero), expected);
 
-    when(db.update(someSuperhero)).thenReturn(Database.Status.ItemUpdatedSuccessfully);
+    when(db.update(someSuperhero)).thenReturn(Database.Status.ItemAddedSuccessfully);
     expected = Reply.Status.OkSuperheroUpdated;
     assertEquals(superheroCollection.updateSuperhero(someSuperhero), expected);
   }
